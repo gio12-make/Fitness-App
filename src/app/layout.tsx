@@ -12,6 +12,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Abs by August',
   description: 'Personal performance dashboard — abs challenge tracker',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'AbsApp',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
