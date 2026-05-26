@@ -295,11 +295,6 @@ export default function DashboardPage() {
             <h1 className="text-2xl font-semibold text-[#F5F5F7] tracking-tight">Performance</h1>
             <p className="text-sm text-[#44444A] mt-0.5 font-mono">{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#0A84FF]/10 border border-[#0A84FF]/20">
-              <Zap size={14} className="text-[#0A84FF]" />
-            </div>
-          </div>
         </div>
       </FadeIn>
 
