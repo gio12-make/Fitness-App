@@ -47,7 +47,7 @@ export default function SettingsPage() {
     setSaved(true);
     // After first-time setup, go straight to dashboard
     if (isFirstSetup) {
-      setTimeout(() => router.replace('/dashboard'), 800);
+      setTimeout(() => { window.location.href = '/dashboard'; }, 800);
     } else {
       setTimeout(() => setSaved(false), 2000);
     }
