@@ -2,12 +2,15 @@ import type { UserProfile } from '@/types';
 
 export const USER_PROFILE: UserProfile = {
   name: 'Giorgio',
+  sex: 'male',
   weightKg: 74,
   heightCm: 177,
   ageYears: 22,
   deadline: '2026-08-01',
+  goalWeightKg: 70,
   proteinTargetG: 160,
   calorieTrainingDay: 2300,
+  calorieCardioDay: 2100,
   calorieRestDay: 2000,
   stepTarget: 10000,
   startWeight: 74,

@@ -7,8 +7,9 @@ import { useAdherence } from '@/hooks/useAdherence';
 import { useWeeklyLogs } from '@/hooks/useWeeklyLogs';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { daysUntil, todayISO, getWeekDates, getWeekStartISO, formatShortDate } from '@/lib/dateUtils';
-import { USER_PROFILE, TARGET_WEIGHT_MIN, TARGET_WEIGHT_MAX } from '@/lib/constants';
+import { USER_PROFILE } from '@/lib/constants';
 import { getTDEE, getNetCalories } from '@/lib/tdee';
+import { useProfile } from '@/hooks/useProfile';
 import { Dumbbell, Wind, Footprints, Check, Zap } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -234,12 +235,12 @@ function AdherenceDots({ history }: { history: { score: number }[] }) {
 export default function DashboardPage() {
   const { log, totalMacros, setGymDone, setCardioDone, setSteps } = useDailyLog();
   const { plan, todayPlan } = useWeeklyPlan();
+  const { profile } = useProfile();
   const adherence = useAdherence();
   const weekDates = useMemo(() => getWeekDates(getWeekStartISO()), []);
   const weekLogs = useWeeklyLogs(weekDates);
 
-  const [savedWeight] = useLocalStorage<number | null>('fit_start_weight', null);
-  const startWeight = savedWeight ?? USER_PROFILE.startWeight;
+  const startWeight = profile?.startWeight ?? USER_PROFILE.startWeight;
   const [stepsVal, setStepsVal] = useState(log.stepsCount?.toString() ?? '');
 
   // Weight history from weekly logs (last 14 days for chart)
@@ -261,21 +262,24 @@ export default function DashboardPage() {
     [last14, last14Logs]
   );
 
-  const days = daysUntil(USER_PROFILE.deadline);
-  const totalChallengeDays = daysUntil(USER_PROFILE.startDate) + days;
+  const deadline = profile?.deadline ?? USER_PROFILE.deadline;
+  const startDate = profile?.startDate ?? USER_PROFILE.startDate;
+  const days = daysUntil(deadline);
+  const totalChallengeDays = daysUntil(startDate) + days;
   const challengePercent = totalChallengeDays > 0
     ? Math.round(((totalChallengeDays - days) / totalChallengeDays) * 100)
     : 0;
 
-  const calTarget = todayPlan?.calorieTarget ?? 2200;
-  const stepTarget = todayPlan?.stepTarget ?? 10000;
+  const proteinTarget = profile?.proteinTargetG ?? 160;
+  const calTarget = todayPlan?.calorieTarget ?? (profile?.calorieRestDay ?? 2200);
+  const stepTarget = todayPlan?.stepTarget ?? (profile?.stepTarget ?? 10000);
   const calPct = Math.round((totalMacros.calories / calTarget) * 100);
-  const proteinPct = Math.round((totalMacros.proteinG / 160) * 100);
+  const proteinPct = Math.round((totalMacros.proteinG / proteinTarget) * 100);
   const stepsPct = log.stepsCount ? Math.round((log.stepsCount / stepTarget) * 100) : 0;
 
   const sessionType = todayPlan?.sessionType ?? 'rest';
-  const tdee = getTDEE(sessionType);
-  const netCals = totalMacros.calories > 0 ? getNetCalories(totalMacros.calories, sessionType) : null;
+  const tdee = getTDEE(sessionType, profile);
+  const netCals = totalMacros.calories > 0 ? getNetCalories(totalMacros.calories, sessionType, profile) : null;
 
   const adherenceColor = adherence.last7DaysAvg === 0 ? '#2A2A2F' : adherence.last7DaysAvg >= 80 ? '#30D158' : adherence.last7DaysAvg >= 55 ? '#FFD60A' : '#FF453A';
 
@@ -397,7 +401,7 @@ export default function DashboardPage() {
             <div className="p-5">
               <div className="flex items-center justify-between mb-4">
                 <Label>Protein today</Label>
-                <span className="text-[10px] font-mono text-[#44444A]">target 160g</span>
+                <span className="text-[10px] font-mono text-[#44444A]">target {proteinTarget}g</span>
               </div>
               <div className="flex items-center gap-5">
                 <Ring percent={proteinPct} size={96} stroke={7} color="#30D158">
@@ -419,7 +423,7 @@ export default function DashboardPage() {
                       <BarFill percent={proteinPct} color="#30D158" />
                     </div>
                     <p className="text-[10px] text-[#44444A] font-mono">
-                      {Math.max(0, 160 - Math.round(totalMacros.proteinG))}g left to hit target
+                      {Math.max(0, proteinTarget - Math.round(totalMacros.proteinG))}g left to hit target
                     </p>
                   </div>
                 </div>
@@ -436,7 +440,7 @@ export default function DashboardPage() {
                 <Label>Weight trend</Label>
                 <div className="flex gap-3 text-xs font-mono">
                   <span className="text-[#44444A]">Start <span className="text-[#8E8E93]">{startWeight}kg</span></span>
-                  <span className="text-[#44444A]">Target <span className="text-[#0A84FF]">{TARGET_WEIGHT_MIN}–{TARGET_WEIGHT_MAX}kg</span></span>
+                  <span className="text-[#44444A]">Target <span className="text-[#0A84FF]">{profile?.goalWeightKg ?? '—'}kg</span></span>
                 </div>
               </div>
               <WeightSparkline data={weightHistory} />

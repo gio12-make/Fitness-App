@@ -79,12 +79,15 @@ export interface CompetitionData {
 
 export interface UserProfile {
   name: string;
+  sex: 'male' | 'female';
   weightKg: number;
   heightCm: number;
   ageYears: number;
   deadline: string;
+  goalWeightKg: number;
   proteinTargetG: number;
   calorieTrainingDay: number;
+  calorieCardioDay: number;
   calorieRestDay: number;
   stepTarget: number;
   startWeight: number;

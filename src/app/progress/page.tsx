@@ -4,10 +4,11 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useDailyLog } from '@/hooks/useDailyLog';
 import { useProgress } from '@/hooks/useProgress';
+import { useProfile } from '@/hooks/useProfile';
 import { Card } from '@/components/ui/Card';
 import { formatShortDate, formatDisplayDate, todayISO } from '@/lib/dateUtils';
 import { Camera, Trash2, TrendingDown, Dumbbell, Wind, Footprints, Scale, ChevronRight } from 'lucide-react';
-import { USER_PROFILE, TARGET_WEIGHT_MIN, TARGET_WEIGHT_MAX } from '@/lib/constants';
+import { USER_PROFILE } from '@/lib/constants';
 import type { CardioDetails } from '@/types';
 
 interface GymSessionLog {
@@ -132,6 +133,7 @@ const FEEL_COLORS = ['', '#FF453A', '#FF9F0A', '#FFD60A', '#30D158', '#0A84FF'];
 export default function ProgressPage() {
   const { log, setWeight, setWaist } = useDailyLog();
   const { photos, weightHistory, waistHistory, addPhoto, deletePhoto } = useProgress();
+  const { profile } = useProfile();
   const diary = useDiary(60);
 
   const [weightInput, setWeightInput] = useState(log.weightKg?.toString() ?? '');
@@ -161,7 +163,8 @@ export default function ProgressPage() {
   };
 
   const today = todayISO();
-  const startWeight = USER_PROFILE.startWeight;
+  const startWeight = profile?.startWeight ?? USER_PROFILE.startWeight;
+  const goalWeight = profile?.goalWeightKg ?? null;
   const currentWeight = log.weightKg ?? (weightHistory[weightHistory.length - 1]?.weight ?? startWeight);
   const lost = +(startWeight - currentWeight).toFixed(1);
 
@@ -177,7 +180,7 @@ export default function ProgressPage() {
         {[
           { label: 'Start', value: startWeight + 'kg', color: 'text-[#A3A3A3]' },
           { label: 'Current', value: (log.weightKg ?? '--') + (log.weightKg ? 'kg' : ''), color: 'text-[#F5F5F5]' },
-          { label: 'Target', value: `${TARGET_WEIGHT_MIN}–${TARGET_WEIGHT_MAX}kg`, color: 'text-[#00D4FF]' },
+          { label: 'Target', value: goalWeight ? `${goalWeight}kg` : '—', color: 'text-[#00D4FF]' },
         ].map((s) => (
           <Card key={s.label} className="text-center py-3">
             <p className={`font-stat font-bold text-lg ${s.color}`}>{s.value}</p>

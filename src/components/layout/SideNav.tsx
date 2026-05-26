@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Utensils, TrendingUp, Calendar, Dumbbell, Music2, Zap, UtensilsCrossed, Medal } from 'lucide-react';
+import { LayoutDashboard, Utensils, TrendingUp, Calendar, Dumbbell, Music2, Zap, UtensilsCrossed, Medal, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const NAV_ITEMS = [
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { href: '/plan',      label: 'Plan',       icon: Calendar },
   { href: '/songs',     label: 'Songs',      icon: Music2 },
   { href: '/badges',    label: 'Badges',     icon: Medal },
+  { href: '/settings',  label: 'Settings',   icon: Settings },
 ];
 
 export function SideNav() {

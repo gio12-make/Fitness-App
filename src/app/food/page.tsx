@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useDailyLog } from '@/hooks/useDailyLog';
 import { useWeeklyPlan } from '@/hooks/useWeeklyPlan';
 import { estimateFood } from '@/lib/estimator';
+import { useProfile } from '@/hooks/useProfile';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input, Textarea } from '@/components/ui/Input';
@@ -83,9 +84,10 @@ function EntryItem({
 export default function FoodPage() {
   const { log, totalMacros, addFoodEntry, deleteFoodEntry, updateFoodEntry } = useDailyLog();
   const { todayPlan } = useWeeklyPlan();
+  const { profile } = useProfile();
 
-  const calTarget = todayPlan?.calorieTarget ?? 2200;
-  const proteinTarget = 160;
+  const calTarget = todayPlan?.calorieTarget ?? (profile?.calorieRestDay ?? 2200);
+  const proteinTarget = profile?.proteinTargetG ?? 160;
 
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

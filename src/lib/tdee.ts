@@ -1,12 +1,4 @@
-import { SessionType } from '@/types';
-import { USER_PROFILE } from './constants';
-
-// Harris-Benedict BMR for Giorgio: 22yo, 74kg, 177cm male
-const BMR =
-  88.362 +
-  13.397 * USER_PROFILE.weightKg +
-  4.799 * USER_PROFILE.heightCm -
-  5.677 * USER_PROFILE.ageYears; // ≈ 1804 kcal
+import type { SessionType, UserProfile } from '@/types';
 
 const MULTIPLIERS: Record<SessionType, number> = {
   gym:    1.55,
@@ -14,10 +6,20 @@ const MULTIPLIERS: Record<SessionType, number> = {
   rest:   1.375,
 };
 
-export function getTDEE(sessionType: SessionType): number {
-  return Math.round(BMR * MULTIPLIERS[sessionType]);
+function calcBMR(p: UserProfile): number {
+  if (p.sex === 'female') {
+    return 447.593 + 9.247 * p.weightKg + 3.098 * p.heightCm - 4.330 * p.ageYears;
+  }
+  return 88.362 + 13.397 * p.weightKg + 4.799 * p.heightCm - 5.677 * p.ageYears;
 }
 
-export function getNetCalories(consumed: number, sessionType: SessionType): number {
-  return consumed - getTDEE(sessionType);
+export function getTDEE(sessionType: SessionType, profile?: UserProfile | null): number {
+  const bmr = profile
+    ? calcBMR(profile)
+    : 88.362 + 13.397 * 74 + 4.799 * 177 - 5.677 * 22; // Giorgio fallback
+  return Math.round(bmr * MULTIPLIERS[sessionType]);
+}
+
+export function getNetCalories(consumed: number, sessionType: SessionType, profile?: UserProfile | null): number {
+  return consumed - getTDEE(sessionType, profile);
 }
