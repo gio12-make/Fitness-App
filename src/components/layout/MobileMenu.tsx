@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Zap, X, LayoutDashboard, Utensils, Dumbbell, UtensilsCrossed,
   TrendingUp, Calendar, Music2, Medal, Settings,
 } from 'lucide-react';
-import { clsx } from 'clsx';
 
 const ALL_PAGES = [
   { href: '/dashboard', label: 'Dashboard',  icon: LayoutDashboard, color: '#0A84FF' },
@@ -23,13 +23,72 @@ const ALL_PAGES = [
 
 export function MobileMenuButton() {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-
   const close = () => setOpen(false);
+
+  useEffect(() => { setMounted(true); }, []);
+
+  const drawer = (
+    <div
+      style={{
+        position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+        zIndex: 99999,
+        display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+      }}
+    >
+      {/* Backdrop */}
+      <div
+        onClick={close}
+        style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.75)' }}
+      />
+      {/* Sheet */}
+      <div style={{ position: 'relative', backgroundColor: '#111113', borderRadius: '24px 24px 0 0', borderTop: '1px solid #222225' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Zap size={15} color="#0A84FF" />
+            <span style={{ color: '#F5F5F7', fontWeight: 700, fontSize: 14 }}>All Pages</span>
+          </div>
+          <button
+            onPointerDown={(e) => { e.stopPropagation(); close(); }}
+            style={{ height: 32, width: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 12, backgroundColor: '#1C1C1E', border: '1px solid #2A2A2F', cursor: 'pointer' }}
+          >
+            <X size={15} color="#8E8E93" />
+          </button>
+        </div>
+        {/* Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, padding: '0 16px 32px' }}>
+          {ALL_PAGES.map(({ href, label, icon: Icon, color }) => {
+            const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={close}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                  padding: '12px 0', borderRadius: 16, textDecoration: 'none',
+                  backgroundColor: active ? `${color}18` : '#0E0E10',
+                  border: `1px solid ${active ? `${color}40` : '#1A1A1D'}`,
+                }}
+              >
+                <div style={{ height: 36, width: 36, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: `${color}15`, border: `1px solid ${color}30` }}>
+                  <Icon size={16} color={color} />
+                </div>
+                <span style={{ fontSize: 11, fontWeight: 600, color: active ? color : '#8E8E93' }}>
+                  {label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <>
-      {/* Top bar trigger */}
       <button
         onClick={() => setOpen(true)}
         className="flex items-center gap-2 px-3 h-8 rounded-xl bg-[#0A84FF]/10 border border-[#0A84FF]/20 active:bg-[#0A84FF]/20 transition-colors"
@@ -38,62 +97,7 @@ export function MobileMenuButton() {
         <span className="text-xs font-semibold text-[#0A84FF]">All Pages</span>
       </button>
 
-      {open && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
-            onClick={close}
-          />
-
-          {/* Drawer */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-[#111113] border-t border-[#222225]"
-            style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-5 pt-5 pb-3">
-              <div className="flex items-center gap-2">
-                <Zap size={15} className="text-[#0A84FF]" />
-                <p className="text-sm font-bold text-[#F5F5F7]">All Pages</p>
-              </div>
-              <button
-                onPointerDown={(e) => { e.stopPropagation(); close(); }}
-                className="h-8 w-8 flex items-center justify-center rounded-xl bg-[#1C1C1E] border border-[#2A2A2F]"
-              >
-                <X size={15} className="text-[#8E8E93]" />
-              </button>
-            </div>
-
-            {/* Grid */}
-            <div className="grid grid-cols-3 gap-2 px-4 pb-4">
-              {ALL_PAGES.map(({ href, label, icon: Icon, color }) => {
-                const active = pathname === href || (href !== '/dashboard' && pathname.startsWith(href));
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    onClick={close}
-                    className="flex flex-col items-center gap-2 py-4 rounded-2xl border transition-all active:scale-95"
-                    style={active
-                      ? { backgroundColor: `${color}15`, borderColor: `${color}35` }
-                      : { backgroundColor: '#0E0E10', borderColor: '#1A1A1D' }}
-                  >
-                    <div
-                      className="h-9 w-9 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: `${color}15`, border: `1px solid ${color}30` }}
-                    >
-                      <Icon size={17} style={{ color }} />
-                    </div>
-                    <span className="text-[11px] font-semibold" style={{ color: active ? color : '#8E8E93' }}>
-                      {label}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      )}
+      {mounted && open && createPortal(drawer, document.body)}
     </>
   );
 }

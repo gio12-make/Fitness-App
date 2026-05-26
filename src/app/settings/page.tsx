@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { useProfile, buildProfile, calcProfileTargets } from '@/hooks/useProfile';
 import { User, Flame, Dumbbell, Footprints } from 'lucide-react';
 
 export default function SettingsPage() {
   const { profile, setProfile } = useProfile();
+  const router = useRouter();
+  const isFirstSetup = !profile;
 
   const [name, setName]         = useState(profile?.name ?? '');
   const [sex, setSex]           = useState<'male' | 'female'>(profile?.sex ?? 'male');
@@ -42,10 +45,13 @@ export default function SettingsPage() {
     const weekKey = `fit_weekly_plan_${monday.toISOString().split('T')[0]}`;
     localStorage.removeItem(weekKey);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    // After first-time setup, go straight to dashboard
+    if (isFirstSetup) {
+      setTimeout(() => router.replace('/dashboard'), 800);
+    } else {
+      setTimeout(() => setSaved(false), 2000);
+    }
   };
-
-  const isFirstSetup = !profile;
 
   return (
     <div className="min-h-screen bg-[#080808] pb-24 lg:pb-8">
