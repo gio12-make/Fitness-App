@@ -111,7 +111,7 @@ export interface CardioDetails {
   duration: number;
   distance?: number;
   steps?: number;
-  type: 'LISS' | 'HIIT' | 'Run' | 'Cycle' | 'Walk' | 'Other';
+  type: 'LISS' | 'HIIT' | 'Run' | 'Cycle' | 'Walk' | 'Football' | 'Tennis' | 'Basketball' | 'Swimming' | 'Golf' | 'Other';
   avgHR?: number;
 }
 

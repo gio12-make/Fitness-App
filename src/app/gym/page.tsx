@@ -31,7 +31,7 @@ const FEEL_OPTIONS = [
   { v: 5, label: 'Beast',  emoji: '🔥', color: '#0A84FF' },
 ];
 
-const CARDIO_TYPES: CardioDetails['type'][] = ['LISS', 'HIIT', 'Run', 'Cycle', 'Walk', 'Other'];
+const CARDIO_TYPES: CardioDetails['type'][] = ['LISS', 'HIIT', 'Run', 'Cycle', 'Walk', 'Football', 'Tennis', 'Basketball', 'Swimming', 'Golf', 'Other'];
 
 const defaultSession = (dateISO: string): GymSessionLog => ({
   dateISO, exercises: [], feel: 0, notes: '', completedAt: null,

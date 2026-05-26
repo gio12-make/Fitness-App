@@ -1,20 +1,30 @@
 'use client';
 
 import type { MuscleGroup } from '@/lib/muscleGroups';
+import { MUSCLE_MAX } from '@/lib/muscleGroups';
 
-function muscleColor(sets: number): string {
+function muscleColor(sets: number, max: number): string {
   if (sets === 0) return '#1C1C1E';
-  const t = Math.min(sets / 20, 1);
-  if (t < 0.5) {
-    const a = (0.3 + t * 1.3).toFixed(2);
-    return `rgba(10,132,255,${a})`;
+  const t = Math.min(sets / max, 1);
+  // Blue → Orange → Red
+  const stops = [
+    { t: 0,   r: 10,  g: 132, b: 255 },
+    { t: 0.5, r: 255, g: 159, b: 10  },
+    { t: 1,   r: 255, g: 59,  b: 48  },
+  ];
+  let lo = stops[0], hi = stops[1];
+  for (let i = 0; i < stops.length - 1; i++) {
+    if (t <= stops[i + 1].t) { lo = stops[i]; hi = stops[i + 1]; break; }
   }
-  const a = (0.65 + (t - 0.5) * 0.7).toFixed(2);
-  return `rgba(94,92,230,${a})`;
+  const s = (t - lo.t) / (hi.t - lo.t);
+  const r = Math.round(lo.r + s * (hi.r - lo.r));
+  const g = Math.round(lo.g + s * (hi.g - lo.g));
+  const b = Math.round(lo.b + s * (hi.b - lo.b));
+  return `rgb(${r},${g},${b})`;
 }
 
 export function MuscleHeatmap({ volume }: { volume: Record<MuscleGroup, number> }) {
-  const c = (m: MuscleGroup) => muscleColor(volume[m]);
+  const c = (m: MuscleGroup) => muscleColor(volume[m], MUSCLE_MAX[m]);
   const neutral = '#1A1A1D';
 
   return (
