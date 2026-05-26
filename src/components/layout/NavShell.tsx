@@ -15,8 +15,7 @@ export function NavShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile top bar — hidden on desktop */}
       {showNav && (
-        <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-12 flex items-center justify-between px-4 bg-[#080808]/90 backdrop-blur-md border-b border-[#111113]">
-          <span className="text-sm font-bold text-[#F5F5F7]">Abs by Aug</span>
+        <div className="lg:hidden fixed top-0 left-0 right-0 z-40 h-12 flex items-center justify-end px-4 bg-[#080808]/90 backdrop-blur-md border-b border-[#111113]">
           <MobileMenuButton />
         </div>
       )}
